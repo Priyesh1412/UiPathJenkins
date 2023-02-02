@@ -1,0 +1,59 @@
+pipeline {
+     agent any
+     environment {
+        RunTests = "True"
+        TestsRunSuccessfully = "True"
+    }
+     stages {
+         stage('Initialize the variables') {
+             steps{
+                 script{
+                     PROCESS_OUTPUT_PATH = "${WORKSPACE}\\Process\\Output\\${BUILD_NUMBER}"
+                     TEST_OUTPUT_PATH = "${WORKSPACE}\\test-reports"
+                     ASSETS_FILE_PATH = "${WORKSPACE}\\assets.csv"
+                 }
+             }               
+         }          
+         stage('Checkout code') {
+             steps {
+                 // Get some code from a GitHub repository
+                 git branch: 'main',
+                 credentialsId: 'Priyesh-AD-123',
+                 url: 'https://github.com/Priyesh1412/UiPathJenkins'
+             }
+         }         
+         stage('Build code for Process') {
+             steps {
+                 echo 'UiPathPack'
+                 echo PROCESS_OUTPUT_PATH
+                 UiPathPack (
+                     outputPath: PROCESS_OUTPUT_PATH,
+                     outputType: 'Process',
+                     projectJsonPath: "${WORKSPACE}",
+                     runWorkflowAnalysis: false,
+                     traceLevel: 'None',
+                     version: AutoVersion()
+                 )
+             }
+         }       
+         stage('Deploy code') {
+             when {
+                equals expected : 'True', actual: TestsRunSuccessfully
+            }
+             steps {
+                 echo 'UiPathDeploy'
+                 UiPathDeploy (
+                    createProcess: true,
+                    credentials: Token(accountName: 'uipatledsyvu', credentialsId: 'OrchAPIUserKey'),
+                    entryPointPaths: 'Main.xaml',
+                    environments: '',
+                    folderName: 'JenkinsTesting',
+                    orchestratorAddress: 'https://cloud.uipath.com/uipatledsyvu',
+                    orchestratorTenant: 'TestMigration3',
+                    packagePath: PROCESS_OUTPUT_PATH,
+                    traceLevel: 'Verbose'
+                )
+             }
+         }          
+     }
+ }

@@ -18,7 +18,7 @@ pipeline {
              steps {
                  // Get some code from a GitHub repository
                  git branch: 'main',
-                 credentialsId: 'Priyesh-AD-123',
+                 credentialsId: 'GitAccessToken',
                  url: 'https://github.com/Priyesh1412/UiPathJenkins'
              }
          }         

@@ -54,25 +54,6 @@ pipeline {
                     traceLevel: 'Verbose'
                 )
              }
-         } 
-         stage('Deploy code UAT') {
-             when {
-                equals expected : 'True', actual: TestsRunSuccessfully
-            }
-             steps {
-                 echo 'UiPathDeploy'
-                 UiPathDeploy (
-                    createProcess: true,
-                    credentials: Token(accountName: 'uipatledsyvu', credentialsId: 'OrchAPIUserKey'),
-                    entryPointPaths: 'Main.xaml',
-                    environments: '',
-                    folderName: 'UATJenkinsTesting',
-                    orchestratorAddress: 'https://cloud.uipath.com/uipatledsyvu',
-                    orchestratorTenant: 'TestMigration3',
-                    packagePath: PROCESS_OUTPUT_PATH,
-                    traceLevel: 'Verbose'
-                )
-             }
-         } 
+         }           
      }
  }
